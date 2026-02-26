@@ -64,7 +64,9 @@ def generate_data(n=100):
 
     df = pd.DataFrame(data)
     df.to_csv("data/raw/fake_invoices.csv", index=False)
-    print(f"✨ Fresh start! Generated {n} invoices in data/raw/fake_invoices.csv")
+    print(f"😁 Fresh start! Generated {n} invoices in data/raw/fake_invoices.csv")
+
+    return df
 
 if __name__ == "__main__":
     generate_data(100)
