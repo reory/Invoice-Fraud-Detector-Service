@@ -1,0 +1,22 @@
+# Python bytecode and cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environments (The heavy stuff)
+venv/
+env/
+.venv/
+
+# Model binaries (Usually too large for Git; recreate via training script)
+models/*.pkl
+
+# Local datasets and logs
+data/raw/*.csv
+*.log
+
+# System/IDE files
+.DS_Store
+.vscode/
+.idea/
