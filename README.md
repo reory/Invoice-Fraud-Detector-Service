@@ -83,6 +83,13 @@ Open data/raw/fake_invoices.csv. Any row where is_fraud is 1 will trigger a high
 
 ---
 
+## 🧪 Automated Testing
+This project includes a comprehensive test suite to ensure the data generator and AI API are perfectly synced. Run them with:
+
+pytest
+
+---
+
 ## 🤝 Contributing
 
 - Contributions are welcome! If you have ideas to improve the fraud detection logic or the dashboard UI:
