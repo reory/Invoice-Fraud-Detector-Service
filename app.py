@@ -90,6 +90,7 @@ def predict():
 
         # Predict Probabilities
         prob_array = MODEL.predict_proba(input_df.values)[0]
+        
         # Using Index 0 based on your terminal output check
         fraud_probability = float(prob_array[1]) 
 

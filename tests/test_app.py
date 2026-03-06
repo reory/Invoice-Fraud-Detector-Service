@@ -8,6 +8,10 @@ def client():
         yield client
 
 def test_high_risk_logic(client):
+    """
+    Define a test function to check the 
+    high-risk logic using the test client.
+    """
 
     # Test a fraudulent payload
     suspicious_payload = {
@@ -38,7 +42,8 @@ def test_high_risk_logic(client):
     assert data.get('is_fraud') is True
 
 def test_predict_route_status(client):
-
+    """Test the predict route to ensure it returns the correct status."""
+    
     # Test a dummy prediction to see if  the engine handles the test.
     payload = {
         "invoice_id": "INV-TEST-001",
@@ -58,6 +63,8 @@ def test_predict_route_status(client):
     }
 
     response = client.post('/predict', json=payload)
+
+    # Extract JSON body from the response as a python dict.
     data = response.get_json()
 
     assert response.status_code == 200
