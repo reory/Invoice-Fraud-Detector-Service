@@ -5,7 +5,6 @@ from core.schemas import InvoiceModel
 from core.explainer import explain_prediction
 import joblib
 import pandas as pd
-import random
  
 app = Flask(__name__)
 CORS(app)

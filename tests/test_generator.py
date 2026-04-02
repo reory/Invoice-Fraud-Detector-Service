@@ -1,6 +1,4 @@
-import pytest
-import pandas as pd
-import os
+import pytest #type:ignore
 from core.generator import generate_data
 
 def test_generate_structure():

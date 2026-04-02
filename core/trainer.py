@@ -12,12 +12,19 @@ def trainModel():
     df = pd.read_csv("data/raw/fake_invoices.csv")
 
     # Sync Check:
-    # Using a robust mapping for any stray "True"/"False" strings
-    mapping = {'True': 1, 'False': 0, 1: 1, 0: 0, True: 1, False: 0}
+    # Normalise boolean-like columns safely
+    mapping = {'True': 1, 'False': 0,} 
     
     cols_to_fix = ['is_duplicate', 'bank_account_change', 'is_govt_official']
     for col in cols_to_fix:
-        df[col] = df[col].map(mapping).fillna(0).astype(int)
+        df[col] = (
+            df[col]
+            .astype(str)
+            .str.lower()
+            .map(mapping)
+            .fillna(0)
+            .astype(int)
+        )
 
     # Sync Check: Feature Engineering (Date & PO)
     df['invoice_date'] = pd.to_datetime(df['invoice_date'])
@@ -72,7 +79,7 @@ def trainModel():
     joblib.dump(le_category, "models/category_encoder.pkl")
     joblib.dump(le_curr, "models/currency_encoder.pkl")
 
-    print(f"--- TRAINING COMPLETE ---")
+    print("--- TRAINING COMPLETE ---")
     print(f"✅ Trained on {len(features)} features using 100-row sample.")
     print(f"📊 Accuracy on Test Set: {model.score(X_test, y_test):.2%}")
 
