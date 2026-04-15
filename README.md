@@ -16,6 +16,13 @@ An end-to-end Machine Learning service that detects fraudulent invoices using **
 
 ---
 
+# 📸 Screenshots
+![Image of the main dashboard](screenshots/dashboard_31.png)
+![Risky invoice detected](screenshots/dashboard_22.png)
+![Healthy invoice detected](screenshots/dashboard_43.png)
+
+---
+
 ## 🛠️ Setup Instructions
 
 ### 1. Create a Virtual Environment
