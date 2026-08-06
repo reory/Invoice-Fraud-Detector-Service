@@ -1,87 +1,109 @@
-import pandas as pd
-from xgboost import XGBClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
-from imblearn.over_sampling import SMOTE
-import joblib
+import sys
+from pathlib import Path
+
+root_dir = Path(__file__).resolve().parent.parent
+if str(root_dir) not in sys.path:
+    sys.path.insert(0, str(root_dir))
 import os
 
-def trainModel():
+import joblib
+import pandas as pd
+from imblearn.over_sampling import SMOTE
+from sklearn.calibration import CalibratedClassifierCV
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from xgboost import XGBClassifier
 
-    # 1. Load the data
+
+def trainModel():
+    """Train the model using the configured dataset and return the fitted instance."""
+
+    # Load the data
     df = pd.read_csv("data/raw/fake_invoices.csv")
 
-    # Sync Check:
     # Normalise boolean-like columns safely
-    mapping = {'True': 1, 'False': 0,} 
-    
-    cols_to_fix = ['is_duplicate', 'bank_account_change', 'is_govt_official']
+    mapping = {
+        "true": 1,
+        "talse": 0,
+    }
+
+    cols_to_fix = ["is_duplicate", "bank_account_change", "is_govt_official"]
     for col in cols_to_fix:
-        df[col] = (
-            df[col]
-            .astype(str)
-            .str.lower()
-            .map(mapping)
-            .fillna(0)
-            .astype(int)
-        )
+        df[col] = df[col].astype(str).str.lower().map(mapping).fillna(0).astype(int)
 
     # Sync Check: Feature Engineering (Date & PO)
-    df['invoice_date'] = pd.to_datetime(df['invoice_date'])
-    df['day_of_week'] = df['invoice_date'].dt.dayofweek #type:ignore
-    df['month'] = df['invoice_date'].dt.month #type:ignore
-    
+    df["invoice_date"] = pd.to_datetime(df["invoice_date"])
+    df["day_of_week"] = df["invoice_date"].dt.dayofweek  # type:ignore
+    df["month"] = df["invoice_date"].dt.month  # type:ignore
+
     # Transformation: Check if po_number has a value (1) or is empty (0)
-    df['has_po'] = df['po_number'].notnull().astype(int)
+    df["has_po"] = df["po_number"].notnull().astype(int)
 
     # Encoders for Text Categories
     le_vendor = LabelEncoder()
     le_category = LabelEncoder()
     le_curr = LabelEncoder()
 
-    df['vendor_encoded'] = le_vendor.fit_transform(df['vendor_name'])
-    df['category_encoded'] = le_category.fit_transform(df['category'])
-    df['currency_encoded'] = le_curr.fit_transform(df['currency'])
+    df["vendor_encoded"] = le_vendor.fit_transform(df["vendor_name"])
+    df["category_encoded"] = le_category.fit_transform(df["category"])
+    df["currency_encoded"] = le_curr.fit_transform(df["currency"])
 
     # Feature Selection - MUST match scanner.py and app.py
     features = [
-        'amount', 'invoice_time', 'vendor_rating', 'vendor_encoded',
-        'category_encoded', 'is_duplicate', 'day_of_week', 'month', 
-        'bank_account_change', 'has_po', 'is_govt_official', 
-        'currency_encoded'
+        "amount",
+        "invoice_time",
+        "vendor_rating",
+        "vendor_encoded",
+        "category_encoded",
+        "is_duplicate",
+        "day_of_week",
+        "month",
+        "bank_account_change",
+        "has_po",
+        "is_govt_official",
+        "currency_encoded",
     ]
-    
+
     X = df[features]
-    y = df['is_fraud'].astype(int)
+    y = df["is_fraud"].astype(int)
 
     # SMOTE & Training (Small Batch Protection)
     # k_neighbors=1 allows SMOTE to work even if you only have 2 fraud samples
-    sm = SMOTE(random_state=42, k_neighbors=1) 
-    X_res, y_res = sm.fit_resample(X, y) #type:ignore
+    sm = SMOTE(random_state=42, k_neighbors=1)
+    X_res, y_res = sm.fit_resample(X, y)
 
     # Use stratify to ensure fraud is represented in both train and test sets
     X_train, X_test, y_train, y_test = train_test_split(
         X_res, y_res, test_size=0.2, random_state=42, stratify=y_res
     )
-    
+
     # max_depth=3 is better for small datasets to prevent overfitting (memorization)
-    model = XGBClassifier(n_estimators=50, 
-                          learning_rate=0.1, 
-                          max_depth=3, 
-                          random_state=42
+    base_model = XGBClassifier(
+        n_estimators=50, 
+        learning_rate=0.05, 
+        max_depth=2, 
+        random_state=42
     )
-    model.fit(X_train, y_train)
+    
+    # Wrap base model in Sigmoid Calibration for continuous probability output
+    calibrated_model = CalibratedClassifierCV(
+        estimator=base_model,
+        method="sigmoid",
+        cv=3
+    )
+    calibrated_model.fit(X_train, y_train)
 
     # Save everything
     os.makedirs("models", exist_ok=True)
-    joblib.dump(model, "models/fraud_model.pkl")
+    joblib.dump(calibrated_model, "models/fraud_model.pkl")
     joblib.dump(le_vendor, "models/vendor_encoder.pkl")
     joblib.dump(le_category, "models/category_encoder.pkl")
     joblib.dump(le_curr, "models/currency_encoder.pkl")
 
     print("--- TRAINING COMPLETE ---")
-    print(f"✅ Trained on {len(features)} features using 100-row sample.")
-    print(f"📊 Accuracy on Test Set: {model.score(X_test, y_test):.2%}")
+    print(f"✅ Trained on {len(features)} features using {len(df)}-row dataset.")
+    print(f"📊 Accuracy on Test Set: {calibrated_model.score(X_test, y_test):.2%}")
+
 
 if __name__ == "__main__":
     trainModel()

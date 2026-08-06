@@ -14,11 +14,29 @@
             --danger: #f44336;
         }
 
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg-color); color: var(--text-main); margin: 0; padding: 20px; }
-        .container { max-width: 900px; margin: auto; background: var(--card-bg); padding: 30px; border-radius: 15px; }
-        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; align-items: center; }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: var(--bg-color); 
+            color: var(--text-main); 
+            margin: 0; 
+            padding: 20px; 
+        }
+        .container { 
+            max-width: 1000px; 
+            margin: auto; 
+            background: var(--card-bg); 
+            padding: 30px; 
+            border-radius: 15px; 
+        }
+        .dashboard-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 30px; 
+            margin-bottom: 30px; 
+            align-items: center; 
+        }
 
-        /* --- THE GAUGE (FIXED) --- */
+        /* --- THE GAUGE --- */
         .gauge-container {
             position: relative;
             width: 250px;
@@ -82,12 +100,77 @@
         }
 
         /* Inputs & Table */
-        input, select, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #444; background: #252525; color: white; box-sizing: border-box; }
-        button { background: #3498db; border: none; font-weight: bold; cursor: pointer; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #333; }
-        .text-fraud { color: var(--danger); }
-        .text-clear { color: var(--success); }
+        input, select, button { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 10px 0; 
+            border-radius: 8px; 
+            border: 1px solid #444; 
+            background: #252525; 
+            color: white; 
+            box-sizing: border-box; 
+        }
+        button { 
+            background: #3498db; 
+            border: none; 
+            font-weight: bold; 
+            cursor: pointer; 
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+
+        /* Audit Log Section Header */
+        .audit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+        .audit-header h2 {
+            margin: 0;
+            font-size: 1.25rem;
+        }
+        .audit-header button {
+            width: auto;
+            padding: 6px 16px;
+            margin: 0;
+            font-size: 0.85rem;
+            background: #444;
+        }
+
+        /* Table Styling */
+        .table-wrapper {
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+        }
+        th, td { 
+            text-align: left; 
+            padding: 12px; 
+            border-bottom: 1px solid #333; 
+            font-size: 0.9rem;
+        }
+        th {
+            background: #252525;
+            color: #aaa;
+        }
+        .text-fraud { color: var(--danger); font-weight: bold; }
+        .text-clear { color: var(--success); font-weight: bold; }
+        .reason-tag {
+            display: inline-block;
+            background: #2a2a2a;
+            padding: 2px 8px;
+            margin: 2px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: #ccc;
+        }
     </style>
 </head>
 <body>
@@ -96,8 +179,8 @@
     <h1>🚀 Invoice Fraud Detector Service</h1>
     <div class="dashboard-grid">
         <div class="input-panel">
-            <input type="text" id="invoice_id" placeholder="ID">
-            <input type="text" id="vendor_name" placeholder="Vendor">
+            <input type="text" id="invoice_id" placeholder="Invoice ID">
+            <input type="text" id="vendor_name" placeholder="Vendor Name">
             <input type="number" id="amount" placeholder="Amount (£)">
             <select id="category">
                 <option value="Software">Software</option>
@@ -105,7 +188,7 @@
                 <option value="Utilities">Utilities</option>
             </select>
             <button type="button" onclick="loadSample()" style="background: #27ae60; margin-bottom: 5px;">🎲 Load Random Sample</button>
-            <button onclick="runAnalysis()">Run Fraud Analysis</button>
+            <button type="button" onclick="runAnalysis()">Run Fraud Analysis</button>
         </div>
 
         <div class="gauge-wrapper">
@@ -122,19 +205,138 @@
         </div>
     </div>
 
-    <table id="historyTable">
-        <thead><tr><th>ID</th><th>Vendor</th><th>Amount</th><th>Risk</th><th>Verdict</th></tr></thead>
-        <tbody></tbody>
-    </table>
+    <!-- Audit Log Section -->
+    <div class="audit-header">
+        <h2>📋 Session Audit Log</h2>
+        <button type="button" id="refresh-audit-btn">Refresh Log</button>
+    </div>
+
+    <div class="table-wrapper">
+        <table id="historyTable">
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>ID</th>
+                    <th>Vendor</th>
+                    <th>Amount</th>
+                    <th>Confidence</th>
+                    <th>Verdict</th>
+                    <th>Flagged Reasons</th>
+                </tr>
+            </thead>
+            <tbody id="audit-log-tbody">
+                <tr>
+                    <td colspan="7" style="text-align: center; color: #888;">No evaluations in current session.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <script>
+    // Store full sample record globally
+    let currentSample = {};
+
+    function escapeHtml(str) {
+        if (typeof str !== "string") return str;
+        return str
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    function renderAuditLog(logEntries) {
+        const tbody = document.getElementById("audit-log-tbody");
+        if (!tbody) return;
+
+        if (!logEntries || logEntries.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" style="text-align: center; color: #888;">No evaluations in current session.</td>
+                </tr>`;
+            return;
+        }
+
+        tbody.innerHTML = logEntries.map(entry => {
+            const isFraud = entry.verdict && entry.verdict.includes("FRAUD");
+            const verdictClass = isFraud ? "text-fraud" : "text-clear";
+
+            let reasonsHtml = "";
+            if (Array.isArray(entry.reasons) && entry.reasons.length > 0) {
+                reasonsHtml = entry.reasons
+                    .map(r => `<span class="reason-tag">${escapeHtml(r)}</span>`)
+                    .join(" ");
+            } else {
+                reasonsHtml = `<span class="reason-tag">None</span>`;
+            }
+
+            return `
+                <tr>
+                    <td><small style="color: #888;">${escapeHtml(entry.timestamp || "")}</small></td>
+                    <td><strong>${escapeHtml(entry.invoice_id || "")}</strong></td>
+                    <td>${escapeHtml(entry.vendor_name || "")}</td>
+                    <td>${escapeHtml(entry.amount || "")}</td>
+                    <td>${escapeHtml(entry.confidence || "")}</td>
+                    <td class="${verdictClass}">${escapeHtml(entry.verdict || "")}</td>
+                    <td>${reasonsHtml}</td>
+                </tr>
+            `;
+        }).join("");
+    }
+
+    async function fetchAuditLog() {
+        const refreshBtn = document.getElementById("refresh-audit-btn");
+        if (refreshBtn) {
+            refreshBtn.disabled = true;
+            refreshBtn.innerText = "Refreshing...";
+        }
+
+        try {
+            // Append timestamp parameter to force cache invalidation
+            const response = await fetch('/audit_log?t=' + new Date().getTime());
+            if (response.ok) {
+                const logs = await response.json();
+                renderAuditLog(logs);
+            } else {
+                console.error("Audit log endpoint returned error status:", response.status);
+            }
+        } catch (err) {
+            console.error("Failed to fetch audit log:", err);
+        } finally {
+            if (refreshBtn) {
+                refreshBtn.disabled = false;
+                refreshBtn.innerText = "Refresh Log";
+            }
+        }
+    }
+
+    async function loadSample() {
+        try {
+            const response = await fetch('/get_sample');
+            const data = await response.json();
+
+            if (data.error) throw new Error(data.error);
+
+            // Save complete record
+            currentSample = data;
+
+            // Fill visible inputs
+            document.getElementById('invoice_id').value = data.invoice_id || "";
+            document.getElementById('vendor_name').value = data.vendor_name || "";
+            document.getElementById('amount').value = data.amount || "";
+            document.getElementById('category').value = data.category || "";
+
+        } catch (err) {
+            console.error("Failed to load sample:", err);
+            alert("Make sure Flask is running and the dataset exists!");
+        }
+    }
+
     async function runAnalysis() {
         const payload = {
-            invoice_id: document.getElementById('invoice_id').value || "INV-001",
-            vendor_name: document.getElementById('vendor_name').value,
-            amount: parseFloat(document.getElementById('amount').value) || 0,
-            category: document.getElementById('category').value,
+            // Default fallback values
             invoice_date: new Date().toISOString().split('T')[0],
             invoice_time: 1200,
             payment_terms: "Net 30",
@@ -143,61 +345,71 @@
             bank_account_change: false,
             is_govt_official: false,
             currency: "GBP",
-            is_duplicate: false
+            is_duplicate: false,
+
+            // Spread complete sample
+            ...currentSample,
+
+            // Overlay visible form entries
+            invoice_id: document.getElementById('invoice_id').value || "INV-001",
+            vendor_name: document.getElementById('vendor_name').value,
+            amount: parseFloat(document.getElementById('amount').value) || 0,
+            category: document.getElementById('category').value
         };
 
         try {
-            const response = await fetch('http://127.0.0.1:5000/predict', {
+            const response = await fetch('/predict', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
             const res = await response.json();
 
+            if (!response.ok) {
+                alert(`Error: ${res["⛔ Error"] || "Prediction failed"}`);
+                return;
+            }
+
             const prob = parseFloat(res.confidence.replace('%', '')) / 100;
 
-            // 1. Move Needle (-90 to +90 degrees)
+            // Move Needle (-90 to +90 degrees)
             const needleDegrees = (prob * 180) - 90;
             document.getElementById('gaugeNeedle').style.transform = `translateX(-50%) rotate(${needleDegrees}deg)`;
             
-            // 2. Move Fill (-180 to 0 degrees)
+            // Move Fill (-180 to 0 degrees)
             const fillDegrees = (prob * 180) - 180;
             const fill = document.getElementById('gaugeFill');
             fill.style.transform = `rotate(${fillDegrees}deg)`;
             document.getElementById('gaugeText').innerText = res.confidence;
 
-            // 3. Color Logic
+            // Gauge Color Thresholds
             let color = '#4caf50';
             if (prob > 0.4) color = '#ff9800';
             if (prob > 0.7) color = '#f44336';
             fill.style.backgroundColor = color;
 
-            // 4. Update Table
-            const tableBody = document.querySelector('#historyTable tbody');
-            const row = tableBody.insertRow(0);
-            row.innerHTML = `<td>${res.invoice_id}</td><td>${payload.vendor_name}</td><td>£${payload.amount}</td><td>${res.confidence}</td><td class="${res.is_fraud ? 'text-fraud' : 'text-clear'}">${res.verdict}</td>`;
             document.getElementById('verdictLabel').innerText = res.verdict;
 
-        } catch (err) { alert("Check Flask/CORS!"); }
-    }
-    async function loadSample() {
-        try {
-            const response = await fetch('http://127.0.0.1:5000/get_sample');
-            const data = await response.json();
+            // Render live audit log from response payload
+            if (res.audit_log) {
+                renderAuditLog(res.audit_log);
+            }
 
-            if (data.error) throw new Error(data.error);
-
-            // This fills your input boxes automatically
-            document.getElementById('invoice_id').value = data.invoice_id;
-            document.getElementById('vendor_name').value = data.vendor_name;
-            document.getElementById('amount').value = data.amount;
-            document.getElementById('category').value = data.category;
-
-        } catch (err) {
-            console.error("Failed to load sample:", err);
-            alert("Make sure Flask is running and the CSV exists!");
+        } catch (err) { 
+            console.error(err);
+            alert("Network error: Check Flask server status!"); 
         }
     }
+
+    // Load initial logs on startup and bind refresh listener
+    document.addEventListener("DOMContentLoaded", () => {
+        fetchAuditLog();
+
+        const refreshBtn = document.getElementById("refresh-audit-btn");
+        if (refreshBtn) {
+            refreshBtn.addEventListener("click", fetchAuditLog);
+        }
+    });
 </script>
 </body>
 </html>

@@ -2,15 +2,16 @@
 
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Repo Size](https://img.shields.io/github/repo-size/reory/Invoice-Fraud-Detector-Service?cacheSeconds=60)
-![scikit-learn](https://img.shields.io/badge/scikit--learn-%23F7931E.svg?style=for-the-badge&logo=scikit-learn&logoColor=white)
-![XGBoost](https://img.shields.io/badge/XGBoost-black.svg?style=for-the-badge&logo=XGBoost&logoColor=white)
+![Last Commit](https://img.shields.io/github/last-commit/reory/Invoice-Fraud-Detector-Service?cacheSeconds=60)
+
+![Faker](https://img.shields.io/badge/Faker-green?style=for-the-badge)
+![Flask](https://img.shields.io/badge/flask-%23000.svg?style=for-the-badge&logo=flask&logoColor=white)
+![Imblearn](https://img.shields.io/badge/Imblearn-orange?style=for-the-badge)
+![Joblib](https://img.shields.io/badge/Joblib-blue?style=for-the-badge)
 ![Pandas](https://img.shields.io/badge/pandas-%23150458.svg?style=for-the-badge&logo=pandas&logoColor=white)
 ![Pydantic](https://img.shields.io/badge/Pydantic-red?style=for-the-badge&logo=pydantic&logoColor=white)
-![Flask](https://img.shields.io/badge/flask-%23000.svg?style=for-the-badge&logo=flask&logoColor=white)
-![Joblib](https://img.shields.io/badge/Joblib-blue?style=for-the-badge)
-![Imblearn](https://img.shields.io/badge/Imblearn-orange?style=for-the-badge)
-![Faker](https://img.shields.io/badge/Faker-green?style=for-the-badge)
-![Last Commit](https://img.shields.io/github/last-commit/reory/Invoice-Fraud-Detector-Service?cacheSeconds=60)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-%23F7931E.svg?style=for-the-badge&logo=scikit-learn&logoColor=white)
+![XGBoost](https://img.shields.io/badge/XGBoost-black.svg?style=for-the-badge&logo=XGBoost&logoColor=white)
 
 An end-to-end Machine Learning service that detects fraudulent invoices using **XGBoost**. This project features a full pipeline: synthetic data generation, model training with SMOTE (oversampling), and a Flask-based web dashboard with a real-time risk speedometer.
 

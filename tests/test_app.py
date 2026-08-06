@@ -1,8 +1,12 @@
 import pytest
+
 from app import app
+
 
 @pytest.fixture
 def client():
+    """Provide a Flask test client with TESTING mode enabled."""
+    
     app.config['TESTING'] = True
     with app.test_client() as client:
         yield client
@@ -69,3 +73,16 @@ def test_predict_route_status(client):
 
     assert response.status_code == 200
     assert "confidence" in data
+
+
+def test_sampling_probability_distribution(client):
+    """
+    Statistically verify that /get_sample yields varied invoice 
+    IDs across multiple calls.
+    """
+
+    samples = [client.get("/get_sample").get_json()["invoice_id"] for _ in range(10)]
+    
+    # Ensure you do not receive the exact same row 10 times consecutively
+    unique_samples = set(samples)
+    assert len(unique_samples) > 1, "Sampling returned deterministic results across 10 calls."
