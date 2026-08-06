@@ -17,21 +17,67 @@ An end-to-end Machine Learning service that detects fraudulent invoices using **
 
 ---
 
-# 📸 Screenshots
+## 📸 Screenshots
 ![Image of the main dashboard](screenshots/dashboard_31.png)
 ![Risky invoice detected](screenshots/dashboard_22.png)
 ![Healthy invoice detected](screenshots/dashboard_43.png)
 
 ---
 
+## 📁 Project Tree
+
+```text
+Invoice_fraud_detector_service
+├── core/
+│   ├── __init__.py
+│   ├── explainer.py
+│   ├── generator.py
+│   ├── schemas.py
+│   └── trainer.py
+├── data/
+│   └── __init__.py
+├── lib/
+│   ├── bindings/
+│   │   └── utils.js
+│   ├── tom-select/
+│   │   ├── tom-select.complete.min.js
+│   │   └── tom-select.css
+│   └── vis-9.1.2/
+│       ├── vis-network.css
+│       └── vis-network.min.js
+├── models/
+│   ├── __init__.py
+│   └── fraud_model.json
+├── screenshots/
+│   ├── dashboard_22.png
+│   ├── dashboard_31.png
+│   └── dashboard_43.png
+├── templates/
+│   └── index.html
+├── tests/
+│   ├── __init__.py
+│   ├── test_app.py
+│   ├── test_generator.py
+│   └── test_routes.py
+├── .gitignore
+├── app.py
+├── CONTRIBUTING.md
+├── demo.mp4
+├── pytest.ini
+├── README.md
+└── requirements.txt
+```
+
+---
+
 ## 🛠️ Setup Instructions
 
-### 1. Create a Virtual Environment
+### Create a Virtual Environment
 ```bash
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
-### 2. Install Dependencies
+### Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
@@ -40,13 +86,25 @@ pip install -r requirements.txt
 
 ## Run the Pipeline (Sequence is Important!)
 
-You must run these in order to create the "brain" for the app:
+You must run these in order to create the **"brain"** for the app:
 
-- Generate Data: python core/generator.py (Creates 100-row fake_invoices.csv)
+- Generate Data:
+(Creates 500-row fake_invoices.csv)
+```bash
+python core/generator.py
+``` 
 
-- Train AI: python core/trainer.py (Trains the model and saves .pkl files)
+- Train AI:
+(Trains the model and saves .pkl files) 
+```bash
+python core/trainer.py
+```
 
-- Start Service: python app.py (Launches the dashboard at http://127.0.0.1:5000)
+- Start Service: 
+```bash
+python app.py
+``` 
+- (Launches the dashboard at http://127.0.0.1:5000)
 
 ---
 
@@ -70,9 +128,14 @@ The AI is trained to recognize specific patterns of risk. To see the "Speedomete
 
 - Verdict: The needle will swing to Red (High Risk) because the AI recognizes the   suspicious vendor name and unusually high amount.
 
-## 🧪 Pro Tip: Find Your Own Test Cases
+---
 
-Open data/raw/fake_invoices.csv. Any row where is_fraud is 1 will trigger a high risk score. Any row where is_fraud is 0 should come back clear!
+## 🧪 Pro Tip: Find random test cases
+
+- In the Dashboard of the UI
+- Click the `load random sample` button and an invoice will be generated.
+- Click the `Run fraud analysis` button and the AI will decide if an invoice is 
+fraudlent or not.
 
 ---
 
@@ -97,7 +160,9 @@ Open data/raw/fake_invoices.csv. Any row where is_fraud is 1 will trigger a high
 ## 🧪 Automated Testing
 This project includes a comprehensive test suite to ensure the data generator and AI API are perfectly synced. Run them with:
 
+```bash
 pytest
+```
 
 ---
 
@@ -137,7 +202,7 @@ pytest
 
 ---
 
-# ❤️ Thanks
+## ❤️ Thanks
 
 Scikit-learn & XGBoost: For the heavy lifting in the ML pipeline
 Faker - For helping create the fake data.
