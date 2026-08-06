@@ -192,13 +192,16 @@ pytest
 
 ---
 
-## 🗺️ Roadmap
+## 🛣️ Roadmap Features
 
-[ ] Batch Processing: Ability to upload an entire CSV for bulk fraud scanning.
-
-[ ] User Auth: Secure login for finance team members.
-
-[ ] Email Alerts: Auto-notify admins when a "High Risk" invoice is detected.
+- [ ] Email Alerts: Trigger an SMTP or REST API notification when an invoice is flagged as "High Risk."
+- [ ] Configurable Export Pipeline: Use `Pandas/Polars` to directly serialize outputs to `CSV`, `Parquet`, or `SQL` targets.
+- [ ] Batch Processing: Add a multipart file upload endpoint to chunk incoming `CSVs` through the inference pipeline.
+- [ ] User Auth: Add user authentication using hashed passwords (bcrypt) and JWT/session tokens.
+- [ ] Interactive Graph & Feature Importance Visualizer: Map `SHAP/LIME` outputs into `JSON` node-edge graphs for vis-network.min.js rendering.  
+- [ ] Real-Time Streaming Ingestion & Inference Endpoint: Build an async WebSocket/SSE endpoint to stream live event payloads to the model.
+- [ ] Automated Model Drift & Performance Monitoring: Run background statistical shift tests (KS-test/PSI) to trigger automated retraining pipelines.
+- [ ] Rust-Accelerated Batch Generator: Implement a native `Rust` generator via PyO3 to eliminate `Python`'s GIL bottlenecks.
 
 ---
 
