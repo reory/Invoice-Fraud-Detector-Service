@@ -249,7 +249,6 @@ pytest
 
 ## 🛣️ Roadmap Features
 
-- [ ] Dark mode interface
 - [ ] Batch invoice processing
 - [ ] CSV and PDF exports
 - [ ] Downloadable audit reports
