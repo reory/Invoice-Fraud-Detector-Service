@@ -16,6 +16,7 @@ def test_get_sample_returns_valid_json(client):
     Ensure /get_sample converts NaN fields to null, 
     not an invalid `NaN` token.
     """
+
     # Force a row with a missing/NaN field, like category_note or po_number
     with patch("pandas.read_csv") as mock_read_csv:
         mock_read_csv.return_value = pd.DataFrame([{

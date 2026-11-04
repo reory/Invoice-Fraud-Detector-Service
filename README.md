@@ -17,14 +17,76 @@ An end-to-end Machine Learning service that detects fraudulent invoices using **
 
 ---
 
-## 📸 Screenshots
-![Image of the main dashboard](screenshots/dashboard_31.png)
-![Risky invoice detected](screenshots/dashboard_22.png)
-![Healthy invoice detected](screenshots/dashboard_43.png)
+## 📑 Table of Contents
+
+- [Why This Project Exists](#-why-this-project-exists)
+- [Problem](#️-problem)
+- [Solution](#-solution)
+- [Screenshots](#-screenshots)
+- [Project Structure](#-project-structure)
+- [Setup Instructions](#️-setup-instructions)
+- [Run The Pipeline](#run-the-pipeline-sequence-is-important)
+- [How To Use The Dashborad](#️-how-to-use-the-dashboard)
+- [Interactive Features](#-interactive-features)
+- [Tech Stack](#-tech-stack)
+- [Testing](#-testing)
+- [Notes](#-notes)
+- [Roadmap Features](#️-roadmap-features)
 
 ---
 
-## 📁 Project Tree
+## 🎯 Why This Project Exists
+
+This project was created to explore machine learning-based fraud detection using synthetic invoice datasets. The aim is to demonstrate a complete fraud analysis workflow, from data generation and model training through to real-time prediction and dashboard visualisation.
+
+---
+
+## 🕵🏼‍♀️ Problem
+
+Invoice fraud can be difficult to detect manually when processing large volumes of financial records. Suspicious vendors, unusual payment values, and anomalous transaction patterns can be overlooked.
+
+## ✅ Solution
+
+This project uses machine learning to identify potentially fraudulent invoices, providing a simple dashboard that allows users to assess risk scores and explore analysis results in real time.
+
+---
+
+## 📸 Screenshots
+
+### Main Dashboard
+
+![Main Dashboard](screenshots/dashboard_31.png)
+
+**Overview**
+- Submit invoice details for analysis.
+- View fraud probability in real time.
+- Monitor historical analysis activity.
+
+---
+
+### High-Risk Invoice Detection
+
+![High Risk Example](screenshots/dashboard_22.png)
+
+**Overview**
+- Demonstrates a suspicious invoice assessment.
+- Displays increased fraud likelihood.
+- Highlights elevated risk indicators.
+
+---
+
+#### Low-Risk Invoice Detection
+
+![Low Risk Example](screenshots/dashboard_43.png)
+
+**Overview**
+- Demonstrates a legitimate invoice assessment.
+- Shows reduced fraud likelihood.
+- Confirms normal transaction characteristics.
+
+---
+
+## 📁 Project Structure
 
 ```text
 Invoice_fraud_detector_service
@@ -72,19 +134,29 @@ Invoice_fraud_detector_service
 
 ## 🛠️ Setup Instructions
 
+### 📦 Clone the Repository
+
+```bash
+git clone https://github.com/reory/Invoice-Fraud-Detector-Service.git
+cd Invoice-Fraud-Detector-Service
+```
+
 ### Create a Virtual Environment
+
 ```bash
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
+
 ### Install Dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
 
 ---
 
-## Run the Pipeline (Sequence is Important!)
+## 🏭 Run the Pipeline (Sequence is Important!)
 
 You must run these in order to create the **"brain"** for the app:
 
@@ -110,7 +182,7 @@ python app.py
 
 ## 🕵️‍♂️ How to Use the Dashboard
 
-The AI is trained to recognize specific patterns of risk. To see the "Speedometer" in action, try these test cases:
+The AI is trained to recognise specific patterns of risk. To see the "Speedometer" in action, try these test cases:
 
 ### ✅ Scenario 1: The Trusted Partner (Low Risk)
 
@@ -126,16 +198,14 @@ The AI is trained to recognize specific patterns of risk. To see the "Speedomete
 
 - Amount: 45000
 
-- Verdict: The needle will swing to Red (High Risk) because the AI recognizes the   suspicious vendor name and unusually high amount.
+- Verdict: The needle will swing to Red (High Risk) because the AI recognises the   suspicious vendor name and unusually high amount.
 
----
-
-## 🧪 Pro Tip: Find random test cases
+### 🧪 Pro Tip: Find random test cases
 
 - In the Dashboard of the UI
 - Click the `load random sample` button and an invoice will be generated.
 - Click the `Run fraud analysis` button and the AI will decide if an invoice is 
-fraudlent or not.
+fraudulent or not.
 
 ---
 
@@ -157,28 +227,13 @@ fraudlent or not.
 
 ---
 
-## 🧪 Automated Testing
+## 🧪 Testing
+
 This project includes a comprehensive test suite to ensure the data generator and AI API are perfectly synced. Run them with:
 
 ```bash
 pytest
 ```
-
----
-
-## 🤝 Contributing
-
-- Contributions are welcome! If you have ideas to improve the fraud detection logic or the dashboard UI:
-
-- Fork the Project.
-
-- Create your Feature Branch (git checkout -b feature/AmazingFeature).
-
-- Commit your Changes (git commit -m 'Add some AmazingFeature').
-
-- Push to the Branch (git push origin feature/AmazingFeature).
-
-- Open a Pull Request.
 
 ---
 
@@ -194,14 +249,18 @@ pytest
 
 ## 🛣️ Roadmap Features
 
-- [ ] Email Alerts: Trigger an SMTP or REST API notification when an invoice is flagged as "High Risk."
-- [ ] Configurable Export Pipeline: Use `Pandas/Polars` to directly serialize outputs to `CSV`, `Parquet`, or `SQL` targets.
-- [ ] Batch Processing: Add a multipart file upload endpoint to chunk incoming `CSVs` through the inference pipeline.
-- [ ] User Auth: Add user authentication using hashed passwords (bcrypt) and JWT/session tokens.
-- [ ] Interactive Graph & Feature Importance Visualizer: Map `SHAP/LIME` outputs into `JSON` node-edge graphs for vis-network.min.js rendering.  
-- [ ] Real-Time Streaming Ingestion & Inference Endpoint: Build an async WebSocket/SSE endpoint to stream live event payloads to the model.
-- [ ] Automated Model Drift & Performance Monitoring: Run background statistical shift tests (KS-test/PSI) to trigger automated retraining pipelines.
-- [ ] Rust-Accelerated Batch Generator: Implement a native `Rust` generator via PyO3 to eliminate `Python`'s GIL bottlenecks.
+- [ ] Dark mode interface
+- [ ] Batch invoice processing
+- [ ] CSV and PDF exports
+- [ ] Downloadable audit reports
+- [ ] Confidence score explanations
+- [ ] Email alert notifications
+- [ ] User authentication
+- [ ] Vendor risk profiling
+- [ ] Feature importance visualisation
+- [ ] Real-time streaming inference
+- [ ] Model drift monitoring
+- [ ] Rust-accelerated data generation
 
 ---
 
